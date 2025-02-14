@@ -1,0 +1,20 @@
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: var(--dark-purple);
+    background-color: var(--secondary-color);
+    background: linear-gradient(to right, var(--secondary-color) 50%, var(--primary-color) 50%);
+}
+
+.main-panel {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--secondary-color);
+}
+
+.main-panel h2 {
+    color: white;
+}
