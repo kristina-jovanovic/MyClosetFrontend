@@ -6,6 +6,9 @@
    [my-closet-frontend.routes :as routes]
    [my-closet-frontend.views :as views]
    [my-closet-frontend.config :as config]
+   [my-closet-frontend.views.navbar]
+   [my-closet-frontend.views.footer]
+   [my-closet-frontend.views.get-recommendation]
    ))
 
 

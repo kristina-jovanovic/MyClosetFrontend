@@ -12,9 +12,9 @@
 
 (defn navbar []
       [:nav.navbar
-       [:a.logo {:href "#home"} "MY CLOSET ©"]
+       [:a.logo {:href "/"} "MY CLOSET ©"]
        [:div.menu {:class (when @menu-open? "active")}
-        [:a {:href "#" :on-click close-menu} "Get recommendation"]
+        [:a {:href "/get-recommendation" :on-click close-menu} "Get recommendation"]
         [:a {:href "#" :on-click close-menu} "Liked"]
         [:a {:href "#" :on-click close-menu} "Favorites"]
         [:a {:href "#" :on-click close-menu} "My clothes"]
