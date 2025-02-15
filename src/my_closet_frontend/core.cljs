@@ -9,6 +9,7 @@
    [my-closet-frontend.views.navbar]
    [my-closet-frontend.views.footer]
    [my-closet-frontend.views.get-recommendation]
+   [my-closet-frontend.views.recommendations]
    ))
 
 

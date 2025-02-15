@@ -108,8 +108,7 @@
          [:span.slider]]]
 
        [:button.button
-        ;{:on-click #(re-frame/dispatch [::events/navigate :home])}
-        {:on-click #(println (str "Selected: " @selections))}
+        {:on-click #(re-frame/dispatch [::events/navigate :recommendations])}
         "Get recommendation"]]])
 
 (defmethod routes/panels :get-recommendation-panel [] [get-recommendation-panel])

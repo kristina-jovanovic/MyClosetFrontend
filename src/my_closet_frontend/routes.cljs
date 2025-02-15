@@ -12,7 +12,8 @@
   (atom
     ["/" {""      :home
           "about" :about
-          "get-recommendation" :get-recommendation}]))
+          "get-recommendation" :get-recommendation
+          "recommendations" :recommendations}]))
 
 (defn parse
   [url]
