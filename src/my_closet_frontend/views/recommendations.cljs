@@ -4,11 +4,12 @@
             [my-closet-frontend.routes :as routes]))
 
 (defonce clothes (r/atom
-                   ["https://www.vecteezy.com/free-photos"
-                    "https://www.vecteezy.com/free-photos"
-                    "https://www.vecteezy.com/free-photos"
-                    "https://www.vecteezy.com/free-photos"
-                    "https://www.vecteezy.com/free-photos"]))
+                   ["https://picsum.photos/150"
+                    "https://picsum.photos/150"
+                    "https://picsum.photos/150"
+                    "https://picsum.photos/150"
+                    "https://picsum.photos/150"
+                    "https://picsum.photos/150"]))
 
 (defn recommendations-panel []
       [:div.home
@@ -19,11 +20,11 @@
          (for [row (partition-all 2 @clothes)]
               [:div.clothes-row
                (for [img row]
-                    [:img.clothing-item {:src img}])])]
+                    [:img.clothing-item {:src "https://picsum.photos/150"}])])]
 
         [:div.btn-container
-         [:button.btn.dislike "Dislike"]
-         [:button.btn.like "Like"]]
+         [:button.btn.dislike {:on-click #(println "Dislike")} "Dislike"]
+         [:button.btn.like {:on-click #(println "Like")} "Like"]]
         ]])
 
 (defmethod routes/panels :recommendations-panel [] [recommendations-panel])

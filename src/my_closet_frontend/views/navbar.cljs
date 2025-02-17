@@ -15,7 +15,7 @@
        [:a.logo {:href "/"} "MY CLOSET ©"]
        [:div.menu {:class (when @menu-open? "active")}
         [:a {:href "/get-recommendation" :on-click close-menu} "Get recommendation"]
-        [:a {:href "#" :on-click close-menu} "Liked"]
+        [:a {:href "/liked-combinations" :on-click close-menu} "Liked combinations"]
         [:a {:href "#" :on-click close-menu} "Favorites"]
         [:a {:href "#" :on-click close-menu} "My clothes"]
         ]

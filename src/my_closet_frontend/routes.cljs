@@ -13,7 +13,8 @@
     ["/" {""      :home
           "about" :about
           "get-recommendation" :get-recommendation
-          "recommendations" :recommendations}]))
+          "recommendations" :recommendations
+          "liked-combinations" :liked-combinations}]))
 
 (defn parse
   [url]
