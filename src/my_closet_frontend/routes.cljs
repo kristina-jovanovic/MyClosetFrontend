@@ -14,7 +14,8 @@
           "about" :about
           "get-recommendation" :get-recommendation
           "recommendations" :recommendations
-          "liked-combinations" :liked-combinations}]))
+          "liked-combinations" :liked-combinations
+          "my-clothes" :my-clothes}]))
 
 (defn parse
   [url]

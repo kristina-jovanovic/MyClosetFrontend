@@ -12,11 +12,11 @@
 
 (defn navbar []
       [:nav.navbar
-       [:a.logo {:href "/"} "MY CLOSET ©"]
+       [:a.logo {:href "/" :style {:color "#cb5b85"}} "MY CLOSET ©"]
        [:div.menu {:class (when @menu-open? "active")}
         [:a {:href "/get-recommendation" :on-click close-menu} "Get recommendation"]
         [:a {:href "/liked-combinations" :on-click close-menu} "Liked combinations"]
         [:a {:href "#" :on-click close-menu} "Favorites"]
-        [:a {:href "#" :on-click close-menu} "My clothes"]
+        [:a {:href "/my-clothes" :on-click close-menu} "My clothes"]
         ]
        [:div.hamburger {:on-click toggle-menu} "☰"]])

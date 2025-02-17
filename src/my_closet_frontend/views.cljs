@@ -14,7 +14,7 @@
       (let [name (re-frame/subscribe [::subs/name])]
            [:div.home
             [:div.content
-             [:h1 "Welcome to MY CLOSET!"]
+             [:h1 {:style {:color "#cb5b85"}} "Welcome to MY CLOSET!"]
              [:p {:style {:color "white"}} "Combine your clothes into the best combinations with us. Track the combinations you liked and adored."]
              [:p {:style {:color "white"}} "Quickly peek into your closet no matter where you are."]
              ;[:a {:on-click #(re-frame/dispatch [::events/navigate :about])}

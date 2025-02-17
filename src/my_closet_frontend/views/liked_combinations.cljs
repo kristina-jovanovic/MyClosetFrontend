@@ -4,12 +4,12 @@
             [my-closet-frontend.routes :as routes]))
 
 (defonce combinations (r/atom
-                        [{:id 1 :images ["https://via.placeholder.com/100"
-                                         "https://via.placeholder.com/100"
-                                         "https://via.placeholder.com/100"]
+                        [{:id 1 :images ["https://picsum.photos/150"
+                                         "https://picsum.photos/150"
+                                         "https://picsum.photos/150"]
                           :rating 3}
-                         {:id 2 :images ["https://via.placeholder.com/100"
-                                         "https://via.placeholder.com/100"]
+                         {:id 2 :images ["https://picsum.photos/150"
+                                         "https://picsum.photos/150"]
                           :rating 5}]))
 
 (defn rate-combination [id new-rating]

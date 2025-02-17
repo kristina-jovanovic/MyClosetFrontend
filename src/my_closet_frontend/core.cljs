@@ -11,6 +11,7 @@
    [my-closet-frontend.views.get-recommendation]
    [my-closet-frontend.views.recommendations]
    [my-closet-frontend.views.liked-combinations]
+   [my-closet-frontend.views.my-clothes]
    ))
 
 
