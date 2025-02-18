@@ -15,6 +15,7 @@
           "get-recommendation" :get-recommendation
           "recommendations" :recommendations
           "liked-combinations" :liked-combinations
+          "favorites" :favorites
           "my-clothes" :my-clothes}]))
 
 (defn parse

@@ -37,7 +37,7 @@
 (defn liked-combinations-panel []
       [:div.home
        [:div.liked-container
-       [:h2.title {:style {:color "#cb5b85"}} "Your Liked Combinations"]
+       [:h2.title {:style {:color "#cb5b85"}} "Your liked combinations"]
        (for [comb @combinations]
             ^{:key (:id comb)}
             [combination-item comb])]])

@@ -16,7 +16,7 @@
        [:div.menu {:class (when @menu-open? "active")}
         [:a {:href "/get-recommendation" :on-click close-menu} "Get recommendation"]
         [:a {:href "/liked-combinations" :on-click close-menu} "Liked combinations"]
-        [:a {:href "#" :on-click close-menu} "Favorites"]
+        [:a {:href "/favorites" :on-click close-menu} "Favorites"]
         [:a {:href "/my-clothes" :on-click close-menu} "My clothes"]
         ]
        [:div.hamburger {:on-click toggle-menu} "☰"]])

@@ -26,7 +26,7 @@
                   :type "top" :color "pastel" :style "casual" :season "winter"}]]
     [:div.home
      [:div.liked-container
-     [:h2.title {:style {:color "#cb5b85"}} "My Clothes"]
+     [:h2.title {:style {:color "#cb5b85"}} "Your clothes"]
      [:div.clothes-grid
       (map clothing-card clothes)]]]))
 
