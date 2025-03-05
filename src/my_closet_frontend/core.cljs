@@ -2,6 +2,7 @@
   (:require
    [reagent.dom :as rdom]
    [re-frame.core :as re-frame]
+   [day8.re-frame.http-fx]
    [my-closet-frontend.events :as events]
    [my-closet-frontend.routes :as routes]
    [my-closet-frontend.views :as views]

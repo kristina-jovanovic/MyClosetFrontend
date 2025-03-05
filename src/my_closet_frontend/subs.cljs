@@ -11,3 +11,12 @@
  ::active-panel
  (fn [db _]
    (:active-panel db)))
+
+;my-clothes
+
+;; Define a re-frame subscription to get clothes from the app state
+(re-frame/reg-sub
+  ::clothes
+  (fn [db _]
+      (js/console.log "Subscription triggered, current db:" db) ;; ✅ Debugging
+      (:clothes db))) ;; ✅ Extract clothes list from db
