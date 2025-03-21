@@ -22,14 +22,11 @@
       (r/create-class
         {:component-did-mount
          (fn []
-             (js/console.log "🟢 Component mounted, fetching clothes...") ;; ✅ Debugging
              (re-frame/dispatch [::events/fetch-clothes])) ;; Dispatch fetch event
 
          :reagent-render
          (fn []
              (let [clothes @(re-frame/subscribe [::subs/clothes])]
-                  (js/console.log "🎨 UI re-rendered! Clothes:" clothes) ;; ✅ Log when re-render happens
-
                   [:div.home
                    [:div.liked-container
                     [:h2.title {:style {:color "#cb5b85"}} "Your clothes"]

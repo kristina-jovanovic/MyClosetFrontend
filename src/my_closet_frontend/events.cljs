@@ -29,27 +29,23 @@
 
 ;my-clothes
 
-;; Define a re-frame event to fetch clothes from the backend
 (re-frame/reg-event-fx
   ::fetch-clothes
   (fn [_ _]
       {:http-xhrio {:method          :get
                     :uri             "http://localhost:3000/my-clothes"
-                    :response-format (ajax.edn/edn-response-format)
+                    :response-format (ajax/json-response-format {:keywords? true})
                     :on-success      [::fetch-clothes-success]
                     :on-failure      [::fetch-clothes-failure]}}))
 
-
-;; Define a re-frame event to handle successful fetch
 (re-frame/reg-event-db
   ::fetch-clothes-success
   (fn [db [_ response]]
-      (js/console.log "Fetched Clothes:" response) ;; Debugging
-      (assoc db :clothes (:body response)))) ;; Store clothes in app state
+      (js/console.log "Fetched Clothes:" response)
+      (assoc db :clothes response)))
 
-;; Define a re-frame event to handle fetch failure
 (re-frame/reg-event-db
   ::fetch-clothes-failure
   (fn [db [_ error]]
       (js/console.error "Failed to fetch clothes:" error)
-      db)) ;; Keep the state unchanged
+      db))
