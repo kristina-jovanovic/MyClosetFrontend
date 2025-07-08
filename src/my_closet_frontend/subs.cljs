@@ -13,8 +13,13 @@
    (:active-panel db)))
 
 ;my-clothes
-;; Define a re-frame subscription to get clothes from the app state
 (re-frame/reg-sub
   ::clothes
   (fn [db _]
       (:clothes db)))
+
+;recommendations
+(re-frame/reg-sub
+  ::combinations
+  (fn [db _]
+      (:combinations db)))
