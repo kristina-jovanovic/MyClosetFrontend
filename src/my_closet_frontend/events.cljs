@@ -73,52 +73,6 @@
       (js/console.error "Failed to fetch recommendations:" error)
       db))
 
-; save feedback about combination
-;(re-frame/reg-event-fx
-;  ::insert-feedback
-;  (fn [{:keys [db]} [_ user-id combination opinion]]
-;      {:http-xhrio {:method          :post
-;                    :uri             "http://localhost:3000/insert-feedback"
-;                    :params          {:user        user-id
-;                                      :combination combination
-;                                      :opinion     opinion}
-;                    :format          (ajax/json-request-format)
-;                    :response-format (ajax/json-response-format {:keywords? true})
-;                    :headers         {"Content-Type" "application/json"}
-;                    :on-success      [::feedback-saved]
-;                    :on-failure      [::feedback-error]}}))
-
-; OVO JE BILO PRE IZMENE
-;(re-frame/reg-event-fx
-;  ::insert-feedback
-;  (fn [{:keys [db]} [_ user-id combination opinion]]
-;      ;(let [payload {:user-id user-id
-;      ;               :combination combination
-;      ;               :opinion opinion}]
-;      ;     (println "Sending feedback payload:" (clj->js payload)) ;; Debug log
-;      ;     {:http-xhrio {:method          :post
-;      ;                   :uri             "http://localhost:3000/insert-feedback"
-;      ;                   :headers         {"Content-Type" "application/json"}
-;      ;                   :body            (json/generate-string payload)
-;      ;                   :response-format (ajax/json-response-format {:keywords? true})
-;      ;                   :on-success      [::feedback-saved]
-;      ;                   :on-failure      [::feedback-failed]}})
-;      (let [payload {:user-id "test-user"
-;                     :combination ["item1" "item2"]
-;                     :opinion "like"}
-;            json-body (js/JSON.stringify (clj->js payload))]
-;           (println "Final JSON being sent:" json-body)  ;; 🛠 Debug
-;           {:http-xhrio {:method :post
-;                         :uri "http://localhost:3000/insert-feedback"
-;                         :headers {"Content-Type" "application/json"}
-;                         :body json-body
-;                         :response-format (ajax/json-response-format {:keywords? true})
-;                         :on-success [::feedback-saved]
-;                         :on-failure [::feedback-failed]}})
-;
-;
-;      ))
-
 (re-frame/reg-event-fx
   ::insert-feedback
   (fn [_ [_ feedback]]
