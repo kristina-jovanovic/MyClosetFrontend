@@ -9,15 +9,15 @@
 (defn normalize-combination [combination clothes]
       (js/console.log "NORMALIZE-COMBINATION input:" (clj->js combination))
       (cond
-        ;; kombinacija je lista komada
+        ; kombinacija je lista komada
         (and (sequential? combination)
              (map? (first combination))
              (:photo (first combination)))
         (do
-          (js/console.log "✅ Kombinacija je direktna lista komada")
+          (js/console.log "Kombinacija je direktna lista komada")
           (vec combination))
 
-        ;; kombinacija iz baze
+        ; kombinacija iz baze
         (and (map? combination)
              (string? (:pieces combination)))
         (let [ids (map #(js/parseInt %) (clojure.string/split (:pieces combination) #","))
@@ -27,92 +27,8 @@
 
         :else
         (do
-          (js/console.warn "❌ Neprepoznat format kombinacije!")
+          (js/console.warn "Neprepoznat format kombinacije!")
           nil)))
-
-
-
-
-;(defn unpack-combination [combination all-clothes]
-;      ; pun naziv!
-;      (let [raw-pieces (get combination :pieces)]
-;           (js/console.log "Raw pieces value:" raw-pieces)
-;           (if (and (string? raw-pieces) (not (clojure.string/blank? raw-pieces)))
-;             (let [pieces-list (clojure.string/split raw-pieces #",")
-;                   piece-ids (->> pieces-list
-;                                  (map clojure.string/trim)
-;                                  (map #(js/parseInt % 10))
-;                                  (filter (complement js/isNaN)))]
-;                  (js/console.log "Parsed IDs:" (clj->js piece-ids))
-;                  (let [found (filter #(some #{(:piece-id %)} piece-ids) all-clothes)]
-;                       (js/console.log "Found pieces:" (clj->js found))
-;                       found))
-;             (do
-;               (js/console.log "pieces field missing or invalid")
-;               []))))
-
-
-;(defn recommendations-panel []
-;      (let [combinations   (re-frame/subscribe [::subs/combinations])
-;            clothes        (re-frame/subscribe [::subs/clothes]) ;; odeca sa backa
-;            feedback-msg   (re-frame/subscribe [::subs/feedback-message])
-;            current-index  (r/atom 0)]
-;           ;; Fetch odmah
-;           (re-frame/dispatch [::events/fetch-recommendations])
-;           (re-frame/dispatch [::events/fetch-clothes])
-;
-;           (fn []
-;               (let [combination (when (and (seq @combinations)
-;                                            (< @current-index (count @combinations)))
-;                                       (nth @combinations @current-index))
-;                     unpacked (when combination (unpack-combination combination @clothes))]
-;
-;                    [:div.home
-;                     [:div.recommendations-panel.container
-;
-;                      ; prikaz poruke ako postoji
-;                      (when @feedback-msg
-;                            [:div.feedback-message
-;                             {:style {:padding "10px"
-;                                      :margin-bottom "10px"
-;                                      :background-color "#f0f0f0"
-;                                      :border-radius "5px"
-;                                      :text-align "center"
-;                                      :font-weight "bold"
-;                                      :color "#333"}}
-;                             @feedback-msg])
-;                      [:p.recommendations-title "Recommended combination"]
-;
-;                      (cond
-;                        (nil? @combinations)
-;                        [:span "Loading..."]
-;
-;                        (> @current-index (dec (count @combinations)))
-;                        [:span "No remaining combinations."]
-;
-;                        :else
-;                        [:<>
-;                         [:div.clothes-container {:key @current-index}
-;                          (for [row (partition-all 2 unpacked)]
-;                               [:div.clothes-row
-;                                (for [piece row]
-;                                     ^{:key (:piece-id piece)}
-;                                     [:img.clothing-item {:src (:photo piece)}])])]
-;
-;                         [:div.btn-container
-;                          [:button.btn.dislike
-;                           {:on-click
-;                            #(do (swap! current-index inc)
-;                                 (re-frame/dispatch [::events/insert-feedback {:user-id 2 ; IZMENI ID
-;                                                                               :combination combination
-;                                                                               :opinion "dislike"}]))}
-;                           "Dislike"]
-;
-;                          [:button.btn.like
-;                           {:on-click #(re-frame/dispatch [::events/insert-feedback {:user-id 2 ; IZMENI ID
-;                                                                                     :combination combination
-;                                                                                     :opinion "like"}])}
-;                           "Like"]]])]]))))
 
 (defn recommendations-panel []
       (let [combinations   (re-frame/subscribe [::subs/combinations])
@@ -156,7 +72,7 @@
                            [:span "Loading..."]
 
                            (nil? unpacked)
-                           [:span "⏳ Učitavanje kombinacije..."]
+                           [:span "Loading combination..."]
 
                            (> @current-index (dec (count @combinations)))
                            [:span "No remaining combinations."]

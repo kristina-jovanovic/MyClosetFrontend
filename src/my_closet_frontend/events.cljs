@@ -96,8 +96,9 @@
 (re-frame/reg-event-fx
   ::feedback-error
   (fn [{:keys [db]} [_ error]]
-      {:db (assoc db :feedback-message "Error occured while trying to save feedback.")
-       :dispatch-later [{:ms 3000 :dispatch [::clear-feedback-message]}]}))
+      (let [msg (get-in error [:response :msg] "Error occurred while trying to save feedback.")]
+           {:db (assoc db :feedback-message msg)
+            :dispatch-later [{:ms 3000 :dispatch [::clear-feedback-message]}]})))
 
 (re-frame/reg-event-fx
   ::after-feedback-delay
