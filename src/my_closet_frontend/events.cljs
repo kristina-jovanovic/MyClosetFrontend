@@ -50,8 +50,33 @@
       (js/console.error "Failed to fetch clothes:" error)
       db))
 
-;get recommendations
 
+;set filters - send it to back
+(re-frame/reg-event-fx
+  ::send-filters
+  (fn [_ [_ filters]]
+      {:http-xhrio {:method          :post
+                    :uri             "http://localhost:3000/get-recommendations"
+                    :params          filters
+                    :format          (ajax/json-request-format)
+                    :response-format (ajax/json-response-format {:keywords? true})
+                    :headers         {"Content-Type" "application/json"}
+                    :on-success      [::filters-success]
+                    :on-failure      [::filters-failure]}}))
+
+(re-frame/reg-event-db
+  ::filters-success
+  (fn [db [_ response]]
+      (js/console.log "Filters sent successfully." response)
+      db))
+
+(re-frame/reg-event-db
+  ::filters-failure
+  (fn [db [_ error]]
+      (js/console.error "Failure while sending filters." error)
+      db))
+
+;get recommendations
 (re-frame/reg-event-fx
   ::fetch-recommendations
   (fn [_ _]
@@ -90,7 +115,7 @@
   (fn [{:keys [db]} [_ response]]
       {:db (-> db
                (assoc :feedback-message "Feedback saved successfully.")
-               (assoc :last-feedback-opinion (:opinion response))) ; pamti opinion (like/dislike)
+               (assoc :last-feedback-opinion (:opinion response))) ; pamti opinion (like/dislike) da bi znao da li treba da ga preusmeri
        :dispatch-later [{:ms 3000 :dispatch [::after-feedback-delay]}]}))
 
 (re-frame/reg-event-fx

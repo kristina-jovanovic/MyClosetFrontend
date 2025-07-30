@@ -31,79 +31,83 @@
           nil)))
 
 (defn recommendations-panel []
-      (let [combinations   (re-frame/subscribe [::subs/combinations])
-            clothes        (re-frame/subscribe [::subs/clothes])
-            feedback-msg   (re-frame/subscribe [::subs/feedback-message])
-            current-index  (r/atom 0)]
+      (let [combinations (re-frame/subscribe [::subs/combinations])
+            clothes (re-frame/subscribe [::subs/clothes])
+            feedback-msg (re-frame/subscribe [::subs/feedback-message])
+            current-index (r/atom 0)]
 
            ;; Fetch pri mountovanju
            (re-frame/dispatch [::events/fetch-clothes])
            (re-frame/dispatch [::events/fetch-recommendations])
 
            (fn []
-               (let [data-ready? (and (seq @combinations) (seq @clothes))
-                     combination (when (and data-ready?
-                                            (< @current-index (count @combinations)))
-                                       (nth @combinations @current-index))
-                     unpacked (when data-ready?
-                                    (normalize-combination combination @clothes))]
 
-                    (js/console.log "COMBINATION @index" (clj->js combination))
-                    (js/console.log "CLOTHES" (clj->js @clothes))
-                    [:div.home
-                     [:div.recommendations-panel.container
+                 (let [data-ready? (and (seq @combinations) (seq @clothes))
+                       combination (when (and data-ready?
+                                              (< @current-index (count @combinations)))
+                                         (nth @combinations @current-index))
+                       unpacked (when data-ready?
+                                      (normalize-combination combination @clothes))]
 
-                      (if @feedback-msg
-                        [:div.feedback-message
-                         {:style {:padding "10px"
-                                  :margin-bottom "10px"
-                                  :background-color "#f0f0f0"
-                                  :border-radius "5px"
-                                  :text-align "center"
-                                  :font-weight "bold"
-                                  :color "#333"}}
-                         @feedback-msg]
+                      (js/console.log "COMBINATION @index" (clj->js combination))
+                      (js/console.log "CLOTHES" (clj->js @clothes))
+                      [:div.home
+                       [:div.recommendations-panel.container
 
-                        [:<>
-                         [:p.recommendations-title "Recommended combination"]
+                        (if @feedback-msg
+                          [:div.feedback-message
+                           {:style {:padding          "10px"
+                                    :margin-bottom    "10px"
+                                    :background-color "#f0f0f0"
+                                    :border-radius    "5px"
+                                    :text-align       "center"
+                                    :font-weight      "bold"
+                                    :color            "#333"}}
+                           @feedback-msg]
 
-                         (cond
-                           (not data-ready?)
-                           [:span "Loading..."]
+                          [:<>
+                           [:p.recommendations-title "Recommended combination"]
 
-                           (nil? unpacked)
-                           [:span "Loading combination..."]
+                           (cond
+                             (empty? @combinations)
+                             [:span "Sorry, no recommendations available."]
 
-                           (> @current-index (dec (count @combinations)))
-                           [:span "No remaining combinations."]
+                             (not data-ready?)
+                             [:span "Loading..."]
 
-                           :else
-                           [:<>
-                            [:div.clothes-container {:key @current-index}
-                             (for [row (partition-all 2 unpacked)]
-                                  [:div.clothes-row
-                                   (for [piece row]
-                                        ^{:key (:piece-id piece)}
-                                        [:img.clothing-item {:src (:photo piece)}])])]
+                             (nil? unpacked)
+                             [:span "Loading combination..."]
 
-                            [:div.btn-container
-                             [:button.btn.dislike
-                              {:on-click
-                               #(do (swap! current-index inc)
-                                    (re-frame/dispatch
-                                      [::events/insert-feedback {:user-id 2
-                                                                 :combination combination
-                                                                 :opinion "dislike"}]))}
-                              "Dislike"]
+                             (> @current-index (dec (count @combinations)))
+                             [:span "No remaining combinations."]
 
-                             [:button.btn.like
-                              {:on-click
-                               #(re-frame/dispatch
-                                  [::events/insert-feedback {:user-id 2
-                                                             :combination combination
-                                                             :opinion "like"}])}
-                              "Like"]]])])]]))))
+                             :else
+                             [:<>
+                              [:div.clothes-container {:key @current-index}
+                               (for [row (partition-all 2 unpacked)]
+                                    [:div.clothes-row
+                                     (for [piece row]
+                                          ^{:key (:piece-id piece)}
+                                          [:img.clothing-item {:src (:photo piece)}])])]
+
+                              [:div.btn-container
+                               [:button.btn.dislike
+                                {:on-click
+                                 #(do (swap! current-index inc)
+                                      (re-frame/dispatch
+                                        [::events/insert-feedback {:user-id     2
+                                                                   :combination combination
+                                                                   :opinion     "dislike"}]))}
+                                "Dislike"]
+
+                               [:button.btn.like
+                                {:on-click
+                                 #(re-frame/dispatch
+                                    [::events/insert-feedback {:user-id     2
+                                                               :combination combination
+                                                               :opinion     "like"}])}
+                                "Like"]]])])]]))))
 
 
 
-(defmethod routes/panels :recommendations-panel [] [recommendations-panel])
+      (defmethod routes/panels :recommendations-panel [] [recommendations-panel])

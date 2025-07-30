@@ -5,9 +5,9 @@
             [my-closet-frontend.events :as events]))
 
 (defonce selections (r/atom {:casual true
-                             :work false
+                             :work   false
                              :formal false
-                             :party false
+                             :party  false
                              :summer true
                              :winter false}))
 
@@ -25,28 +25,28 @@
                                        (assoc :winter false))
 
                    (= key :work) (-> s
-                                       (assoc :work (not (:work s)))
-                                       (assoc :casual false)
-                                       (assoc :formal false)
-                                       (assoc :party false))
+                                     (assoc :work (not (:work s)))
+                                     (assoc :casual false)
+                                     (assoc :formal false)
+                                     (assoc :party false))
 
                    (= key :formal) (-> s
-                                     (assoc :formal (not (:formal s)))
-                                     (assoc :casual false)
-                                     (assoc :work false)
-                                     (assoc :party false))
+                                       (assoc :formal (not (:formal s)))
+                                       (assoc :casual false)
+                                       (assoc :work false)
+                                       (assoc :party false))
 
                    (= key :party) (-> s
-                                     (assoc :party (not (:party s)))
-                                     (assoc :casual false)
-                                     (assoc :formal false)
-                                     (assoc :work false))
+                                      (assoc :party (not (:party s)))
+                                      (assoc :casual false)
+                                      (assoc :formal false)
+                                      (assoc :work false))
 
                    (= key :casual) (-> s
-                                     (assoc :casual (not (:casual s)))
-                                     (assoc :work false)
-                                     (assoc :formal false)
-                                     (assoc :party false))
+                                       (assoc :casual (not (:casual s)))
+                                       (assoc :work false)
+                                       (assoc :formal false)
+                                       (assoc :party false))
 
                    :else (update s key not)))))
 
@@ -54,61 +54,65 @@
 (defn get-recommendation-panel []
       [:div.home
        [:div.get-recommendation-panel.container
-       [:p.get-recommendation-title "Get your outfit recommendation"]
+        [:p.get-recommendation-title "Get your outfit recommendation"]
         [:p "Please mark if you have any specific requests"]
 
-       [:div.switch-container
-        [:span "Casual"]
-        [:label.switch
-         [:input {:type "checkbox"
-                  :checked (:casual @selections)
-                  :on-change #(toggle-selection :casual)}]
-         [:span.slider]]]
+        [:div.switch-container
+         [:span "Casual"]
+         [:label.switch
+          [:input {:type      "checkbox"
+                   :checked   (:casual @selections)
+                   :on-change #(toggle-selection :casual)}]
+          [:span.slider]]]
 
         [:div.switch-container
          [:span "Work"]
          [:label.switch
-          [:input {:type "checkbox"
-                   :checked (:work @selections)
+          [:input {:type      "checkbox"
+                   :checked   (:work @selections)
                    :on-change #(toggle-selection :work)}]
           [:span.slider]]]
 
-       [:div.switch-container
-        [:span "Formal"]
-        [:label.switch
-         [:input {:type "checkbox"
-                  :checked (:formal @selections)
-                  :on-change #(toggle-selection :formal)}]
-         [:span.slider]]]
+        [:div.switch-container
+         [:span "Formal"]
+         [:label.switch
+          [:input {:type      "checkbox"
+                   :checked   (:formal @selections)
+                   :on-change #(toggle-selection :formal)}]
+          [:span.slider]]]
 
         [:div.switch-container
          [:span "Party"]
          [:label.switch
-          [:input {:type "checkbox"
-                   :checked (:party @selections)
+          [:input {:type      "checkbox"
+                   :checked   (:party @selections)
                    :on-change #(toggle-selection :party)}]
           [:span.slider]]]
 
         [:br]
 
-       [:div.switch-container
-        [:span "Summer"]
-        [:label.switch
-         [:input {:type "checkbox"
-                  :checked (:summer @selections)
-                  :on-change #(toggle-selection :summer)}]
-         [:span.slider]]]
+        [:div.switch-container
+         [:span "Summer"]
+         [:label.switch
+          [:input {:type      "checkbox"
+                   :checked   (:summer @selections)
+                   :on-change #(toggle-selection :summer)}]
+          [:span.slider]]]
 
-       [:div.switch-container
-        [:span "Winter"]
-        [:label.switch
-         [:input {:type "checkbox"
-                  :checked (:winter @selections)
-                  :on-change #(toggle-selection :winter)}]
-         [:span.slider]]]
+        [:div.switch-container
+         [:span "Winter"]
+         [:label.switch
+          [:input {:type      "checkbox"
+                   :checked   (:winter @selections)
+                   :on-change #(toggle-selection :winter)}]
+          [:span.slider]]]
 
-       [:button.button
-        {:on-click #(re-frame/dispatch [::events/navigate :recommendations])}
-        "Get recommendation"]]])
+        [:button.button
+         {:on-click #(do
+                       (re-frame/dispatch
+                         [::events/send-filters @selections]) ; salje filtere backendu
+                       (re-frame/dispatch
+                         [::events/navigate :recommendations]))}
+         "Get recommendation"]]])
 
 (defmethod routes/panels :get-recommendation-panel [] [get-recommendation-panel])
