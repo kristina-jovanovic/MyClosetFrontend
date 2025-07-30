@@ -23,3 +23,9 @@
   ::combinations
   (fn [db _]
       (:combinations db)))
+
+;feedback-message
+(re-frame/reg-sub
+  ::feedback-message
+  (fn [db _]
+      (:feedback-message db)))

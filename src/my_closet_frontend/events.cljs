@@ -64,8 +64,8 @@
 (re-frame/reg-event-db
   ::fetch-recommendations-success
   (fn [db [_ response]]
-      (js/console.log "Fetched Recommendations:" response)
-      (assoc db :combinations response)))
+      (js/console.log "Fetched Recommendations:" (clj->js response))
+      (assoc db :combinations (mapv vec response))))
 
 (re-frame/reg-event-db
   ::fetch-recommendations-failure
@@ -85,14 +85,36 @@
                     :on-success      [::feedback-saved]
                     :on-failure      [::feedback-error]}}))
 
-
-
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
   ::feedback-saved
-  (fn [db [_ response]]
-      (js/console.log "Feedback saved:" response)))
+  (fn [{:keys [db]} [_ response]]
+      {:db (-> db
+               (assoc :feedback-message "Feedback saved successfully.")
+               (assoc :last-feedback-opinion (:opinion response))) ; pamti opinion (like/dislike)
+       :dispatch-later [{:ms 3000 :dispatch [::after-feedback-delay]}]}))
+
+(re-frame/reg-event-fx
+  ::feedback-error
+  (fn [{:keys [db]} [_ error]]
+      {:db (assoc db :feedback-message "Error occured while trying to save feedback.")
+       :dispatch-later [{:ms 3000 :dispatch [::clear-feedback-message]}]}))
+
+(re-frame/reg-event-fx
+  ::after-feedback-delay
+  (fn [{:keys [db]} _]
+      (let [opinion (:last-feedback-opinion db)]
+           (cond
+             (= opinion "like")
+             {:db (dissoc db :feedback-message :last-feedback-opinion)
+              ::navigate "/liked-combinations"}
+
+             (= opinion "dislike")
+             {:db (dissoc db :feedback-message :last-feedback-opinion)} ; samo skloni poruku, UI vec prikazuje sledecu kombinaciju
+
+             :else
+             {:db (dissoc db :feedback-message :last-feedback-opinion)}))))
 
 (re-frame/reg-event-db
-  ::feedback-error
-  (fn [db [_ error]]
-      (js/console.error "Feedback not saved:" error)))
+  ::clear-feedback-message
+  (fn [db _]
+      (assoc db :feedback-message nil)))
