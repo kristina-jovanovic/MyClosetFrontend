@@ -69,8 +69,8 @@
                            [:p.recommendations-title "Recommended combination"]
 
                            (cond
-                             (empty? @combinations)
-                             [:span "Sorry, no recommendations available."]
+                             ;(empty? @combinations)
+                             ;[:span "Sorry, no recommendations available."]
 
                              (not data-ready?)
                              [:span "Loading..."]

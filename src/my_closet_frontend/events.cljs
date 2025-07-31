@@ -64,11 +64,19 @@
                     :on-success      [::filters-success]
                     :on-failure      [::filters-failure]}}))
 
-(re-frame/reg-event-db
+;(re-frame/reg-event-db
+;  ::filters-success
+;  (fn [db [_ response]]
+;      (js/console.log "Filters sent successfully." response)
+;
+;      db))
+(re-frame/reg-event-fx
   ::filters-success
-  (fn [db [_ response]]
-      (js/console.log "Filters sent successfully." response)
-      db))
+  (fn [_ [_ response]]
+      (js/console.log "Filters sent successfully." (clj->js response))
+      (set! (.-location js/window) "/recommendations")
+      {}))
+
 
 (re-frame/reg-event-db
   ::filters-failure

@@ -111,8 +111,7 @@
          {:on-click #(do
                        (re-frame/dispatch
                          [::events/send-filters @selections]) ; salje filtere backendu
-                       (re-frame/dispatch
-                         [::events/navigate :recommendations]))}
+                       )}
          "Get recommendation"]]])
 
 (defmethod routes/panels :get-recommendation-panel [] [get-recommendation-panel])
