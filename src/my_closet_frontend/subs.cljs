@@ -29,3 +29,9 @@
   ::feedback-message
   (fn [db _]
       (:feedback-message db)))
+
+;last-feedback-opinion
+(re-frame/reg-sub
+  ::last-feedback-opinion
+  (fn [db _]
+      (:last-feedback-opinion db)))

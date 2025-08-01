@@ -72,11 +72,11 @@
                              ;(empty? @combinations)
                              ;[:span "Sorry, no recommendations available."]
 
-                             (not data-ready?)
-                             [:span "Loading..."]
-
-                             (nil? unpacked)
-                             [:span "Loading combination..."]
+                             ;(not data-ready?)
+                             ;[:span "Loading..."]
+                             ;
+                             ;(nil? unpacked)
+                             ;[:span "Loading combination..."]
 
                              (> @current-index (dec (count @combinations)))
                              [:span "No remaining combinations."]
@@ -95,7 +95,7 @@
                                 {:on-click
                                  #(do (swap! current-index inc)
                                       (re-frame/dispatch
-                                        [::events/insert-feedback {:user-id     2
+                                        [::events/insert-feedback {:user-id     2 ;IZMENI
                                                                    :combination combination
                                                                    :opinion     "dislike"}]))}
                                 "Dislike"]
@@ -103,7 +103,7 @@
                                [:button.btn.like
                                 {:on-click
                                  #(re-frame/dispatch
-                                    [::events/insert-feedback {:user-id     2
+                                    [::events/insert-feedback {:user-id     2 ;IZMENI
                                                                :combination combination
                                                                :opinion     "like"}])}
                                 "Like"]]])])]]))))

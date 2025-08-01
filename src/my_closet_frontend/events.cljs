@@ -26,7 +26,6 @@
   (fn-traced [{:keys [db]} [_ active-panel]]
              {:db (assoc db :active-panel active-panel)}))
 
-
 ;my-clothes
 
 (re-frame/reg-event-fx
@@ -50,7 +49,6 @@
       (js/console.error "Failed to fetch clothes:" error)
       db))
 
-
 ;set filters - send it to back
 (re-frame/reg-event-fx
   ::send-filters
@@ -64,18 +62,12 @@
                     :on-success      [::filters-success]
                     :on-failure      [::filters-failure]}}))
 
-;(re-frame/reg-event-db
-;  ::filters-success
-;  (fn [db [_ response]]
-;      (js/console.log "Filters sent successfully." response)
-;
-;      db))
 (re-frame/reg-event-fx
   ::filters-success
   (fn [_ [_ response]]
       (js/console.log "Filters sent successfully." (clj->js response))
-      (set! (.-location js/window) "/recommendations")
-      {}))
+      ;(set! (.-location js/window) "/recommendations")      ; VIDI OVO
+      {:navigate [:recommendations]}))
 
 
 (re-frame/reg-event-db
@@ -111,7 +103,7 @@
   (fn [_ [_ feedback]]
       {:http-xhrio {:method          :post
                     :uri             "http://localhost:3000/insert-feedback"
-                    :params          feedback     ;; Clojure map
+                    :params          feedback               ;; Clojure map
                     :format          (ajax/json-request-format)
                     :response-format (ajax/json-response-format {:keywords? true})
                     :headers         {"Content-Type" "application/json"}
@@ -119,34 +111,33 @@
                     :on-failure      [::feedback-error]}}))
 
 (re-frame/reg-event-fx
+  ::after-feedback-delay
+  (fn [{:keys [db]} _]
+      (let [opinion (:last-feedback-opinion db)]
+           (cond
+             (or (= opinion "like") (= opinion :like))
+             {:db        (dissoc db :feedback-message :last-feedback-opinion)
+              :navigate [:liked-combinations]}
+
+             :else
+             {:db (dissoc db :feedback-message :last-feedback-opinion)} ; samo skloni poruku, UI vec prikazuje sledecu kombinaciju
+             ))))
+
+(re-frame/reg-event-fx
   ::feedback-saved
   (fn [{:keys [db]} [_ response]]
-      {:db (-> db
-               (assoc :feedback-message "Feedback saved successfully.")
-               (assoc :last-feedback-opinion (:opinion response))) ; pamti opinion (like/dislike) da bi znao da li treba da ga preusmeri
+      {:db             (-> db
+                           (assoc :feedback-message "Feedback saved successfully.")
+                           (assoc :last-feedback-opinion (name (:opinion response)))) ;PROBAJ OVO
+       ;(assoc :last-feedback-opinion (:opinion response))) ; pamti opinion (like/dislike) da bi znao da li treba da ga preusmeri
        :dispatch-later [{:ms 3000 :dispatch [::after-feedback-delay]}]}))
 
 (re-frame/reg-event-fx
   ::feedback-error
   (fn [{:keys [db]} [_ error]]
       (let [msg (get-in error [:response :msg] "Error occurred while trying to save feedback.")]
-           {:db (assoc db :feedback-message msg)
+           {:db             (assoc db :feedback-message msg)
             :dispatch-later [{:ms 3000 :dispatch [::clear-feedback-message]}]})))
-
-(re-frame/reg-event-fx
-  ::after-feedback-delay
-  (fn [{:keys [db]} _]
-      (let [opinion (:last-feedback-opinion db)]
-           (cond
-             (= opinion "like")
-             {:db (dissoc db :feedback-message :last-feedback-opinion)
-              ::navigate "/liked-combinations"}
-
-             (= opinion "dislike")
-             {:db (dissoc db :feedback-message :last-feedback-opinion)} ; samo skloni poruku, UI vec prikazuje sledecu kombinaciju
-
-             :else
-             {:db (dissoc db :feedback-message :last-feedback-opinion)}))))
 
 (re-frame/reg-event-db
   ::clear-feedback-message

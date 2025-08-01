@@ -18,6 +18,17 @@
           "favorites" :favorites
           "my-clothes" :my-clothes}]))
 
+;(def routes
+;  ["/"
+;   [["" :home]
+;    ["about" :about]
+;    ["get-recommendation" :get-recommendation]
+;    ["recommendations" :recommendations]
+;    ["liked-combinations" :liked-combinations]
+;    ["favorites" :favorites]
+;    ["my-clothes" :my-clothes]]])
+
+
 (defn parse
   [url]
   (bidi/match-route @routes url))
@@ -34,9 +45,11 @@
 (defonce history
   (pushy/pushy dispatch parse))
 
-(defn navigate!
-  [handler]
-  (pushy/set-token! history (url-for handler)))
+(defn navigate! [handler]
+      (let [url (apply url-for handler)] ;handler je npr [:liked-combinations]
+           ;(js/console.log "navigating to handler:" handler "URL:" url)
+           (when url
+                 (pushy/set-token! history url))))
 
 (defn start!
   []
