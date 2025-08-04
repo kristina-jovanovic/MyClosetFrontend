@@ -77,6 +77,7 @@
       db))
 
 ;get recommendations
+;DODATI ID KROZ URL
 (re-frame/reg-event-fx
   ::fetch-recommendations
   (fn [_ _]
@@ -143,3 +144,60 @@
   ::clear-feedback-message
   (fn [db _]
       (assoc db :feedback-message nil)))
+
+;get liked-combinations
+(re-frame/reg-event-fx
+  ::fetch-liked-combinations
+  (fn [_ [_ user-id]] ;; event vektor je npr [::fetch-liked-combinations 1]
+      {:http-xhrio {:method          :get
+                    :uri             (str "http://localhost:3000/liked-combinations?user-id=" user-id)
+                    :response-format (ajax/json-response-format {:keywords? true})
+                    :on-success      [::fetch-liked-combinations-success]
+                    :on-failure      [::fetch-liked-combinations-failure]}}))
+
+;(re-frame/reg-event-db
+;  ::fetch-liked-combinations-success
+;  (fn [db [_ response]]
+;      (js/console.log "Fetched liked combinations:" (clj->js response))
+;      (assoc db :liked-combinations (mapv vec response))))
+
+(re-frame/reg-event-db
+  ::fetch-liked-combinations-success
+  (fn [db [_ response]]
+      (let [parsed (map #(into {} %) response)] ;; <- OVO DODAJ
+           (assoc db :liked-combinations parsed))))
+
+
+(re-frame/reg-event-db
+  ::fetch-liked-combinations-failure
+  (fn [db [_ error]]
+      (js/console.error "Failed to fetch liked combinations:" error)
+      db))
+
+;update/set rating
+(re-frame/reg-event-fx
+  ::update-rating
+  (fn [_ [_ combination-id new-rating]]
+      {:http-xhrio {:method          :put
+                    :uri             "http://localhost:3000/update-rating"
+                    :params          {:combination-id combination-id
+                                      :rating new-rating
+                                      :user-id 2} ;; DODAJ DA IDE DINAMICKI
+                    :format          (ajax/json-request-format)
+                    :response-format (ajax/json-response-format {:keywords? true})
+                    :on-success      [::update-rating-success]
+                    :on-failure      [::update-rating-failure]}}))
+
+(re-frame/reg-event-fx
+  ::update-rating-success
+  (fn [_ [_ response]]
+      (js/console.log "Rating updated successfully:" (clj->js response))
+      {}))
+
+(re-frame/reg-event-fx
+  ::update-rating-failure
+  (fn [_ [_ error]]
+      (js/console.error "Failed to update rating:" (clj->js error))
+      {}))
+
+

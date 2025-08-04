@@ -7,7 +7,7 @@
             [clojure.string :as str]))
 
 (defn normalize-combination [combination clothes]
-      (js/console.log "NORMALIZE-COMBINATION input:" (clj->js combination))
+      ;(js/console.log "NORMALIZE-COMBINATION input:" (clj->js combination))
       (cond
         ; kombinacija je lista komada
         (and (sequential? combination)
@@ -22,7 +22,7 @@
              (string? (:pieces combination)))
         (let [ids (map #(js/parseInt %) (clojure.string/split (:pieces combination) #","))
               clothes-by-id (group-by :piece-id clothes)]
-             (js/console.log "✅ Kombinacija iz baze, ID-jevi:" (clj->js ids))
+             (js/console.log "Kombinacija iz baze, ID-jevi:" (clj->js ids))
              (vec (map #(first (get clothes-by-id %)) ids)))
 
         :else

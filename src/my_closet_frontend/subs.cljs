@@ -35,3 +35,9 @@
   ::last-feedback-opinion
   (fn [db _]
       (:last-feedback-opinion db)))
+
+;liked-combinations
+(re-frame/reg-sub
+  ::liked-combinations
+  (fn [db _]
+      (:liked-combinations db)))
