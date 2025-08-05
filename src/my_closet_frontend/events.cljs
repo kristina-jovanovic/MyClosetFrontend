@@ -185,14 +185,20 @@
                                       :user-id 2} ;; DODAJ DA IDE DINAMICKI
                     :format          (ajax/json-request-format)
                     :response-format (ajax/json-response-format {:keywords? true})
-                    :on-success      [::update-rating-success]
+                    :on-success      [::update-rating-success combination-id new-rating]
                     :on-failure      [::update-rating-failure]}}))
 
-(re-frame/reg-event-fx
+(re-frame/reg-event-db
   ::update-rating-success
-  (fn [_ [_ response]]
+  (fn [db [_ combination-id new-rating response]]
       (js/console.log "Rating updated successfully:" (clj->js response))
-      {}))
+      (update db :liked-combinations
+              (fn [items]
+                  (mapv (fn [comb]
+                            (if (= (:combination-id comb) combination-id)
+                              (assoc comb :rating new-rating)
+                              comb))
+                        items)))))
 
 (re-frame/reg-event-fx
   ::update-rating-failure
