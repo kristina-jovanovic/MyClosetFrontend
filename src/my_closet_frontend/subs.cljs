@@ -41,3 +41,9 @@
   ::liked-combinations
   (fn [db _]
       (:liked-combinations db)))
+
+;favorite-combinations
+(re-frame/reg-sub
+  ::favorite-combinations
+  (fn [db _]
+      (:favorite-combinations db)))

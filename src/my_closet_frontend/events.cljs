@@ -155,16 +155,10 @@
                     :on-success      [::fetch-liked-combinations-success]
                     :on-failure      [::fetch-liked-combinations-failure]}}))
 
-;(re-frame/reg-event-db
-;  ::fetch-liked-combinations-success
-;  (fn [db [_ response]]
-;      (js/console.log "Fetched liked combinations:" (clj->js response))
-;      (assoc db :liked-combinations (mapv vec response))))
-
 (re-frame/reg-event-db
   ::fetch-liked-combinations-success
   (fn [db [_ response]]
-      (let [parsed (map #(into {} %) response)] ;; <- OVO DODAJ
+      (let [parsed (map #(into {} %) response)]
            (assoc db :liked-combinations parsed))))
 
 
@@ -206,4 +200,26 @@
       (js/console.error "Failed to update rating:" (clj->js error))
       {}))
 
+;get favorite combinations
+;get liked-combinations
+(re-frame/reg-event-fx
+  ::fetch-favorite-combinations
+  (fn [_ [_ user-id]]
+      {:http-xhrio {:method          :get
+                    :uri             (str "http://localhost:3000/favorite-combinations?user-id=" user-id)
+                    :response-format (ajax/json-response-format {:keywords? true})
+                    :on-success      [::fetch-favorite-combinations-success]
+                    :on-failure      [::fetch-favorite-combinations-failure]}}))
 
+(re-frame/reg-event-db
+  ::fetch-favorite-combinations-success
+  (fn [db [_ response]]
+      (let [parsed (map #(into {} %) response)]
+           (assoc db :favorite-combinations parsed))))
+
+
+(re-frame/reg-event-db
+  ::fetch-favorite-combinations-failure
+  (fn [db [_ error]]
+      (js/console.error "Failed to fetch favorite combinations:" error)
+      db))

@@ -6,6 +6,7 @@
             [my-closet-frontend.events :as events]))
 
 (defn normalize-combination [combination clothes]
+
       (cond
         ;; kombinacija je lista komada
         (and (sequential? combination)
