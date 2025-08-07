@@ -47,3 +47,19 @@
   ::favorite-combinations
   (fn [db _]
       (:favorite-combinations db)))
+
+;users
+(re-frame/reg-sub
+  ::users
+  (fn [db _] (:users db)))
+
+(re-frame/reg-sub
+  ::current-user-id
+  (fn [db _] (:current-user-id db)))
+
+(re-frame/reg-sub
+  ::current-user
+  :<- [::users]
+  :<- [::current-user-id]
+  (fn [[users current-id] _]
+      (some #(when (= (:user-id %) current-id) %) users)))

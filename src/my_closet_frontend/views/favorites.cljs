@@ -79,11 +79,12 @@
 
 (defn favorites-panel []
       (let [favorite-combinations (re-frame/subscribe [::subs/favorite-combinations])
-            clothes               (re-frame/subscribe [::subs/clothes])]
+            clothes               (re-frame/subscribe [::subs/clothes])
+            user-id (re-frame/subscribe [::subs/current-user-id])]
 
            ;; Fetch pri mountovanju
-           (re-frame/dispatch [::events/fetch-clothes])
-           (re-frame/dispatch [::events/fetch-favorite-combinations 2]) ; hardcoded user-id
+           ;(re-frame/dispatch [::events/fetch-clothes])
+           ;(re-frame/dispatch [::events/fetch-favorite-combinations (js/parseInt user-id)])
 
            (fn []
                (let [clothes-loaded? (seq @clothes)

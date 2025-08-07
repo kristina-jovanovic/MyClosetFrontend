@@ -52,11 +52,12 @@
 
 (defn liked-combinations-panel []
       (let [liked-combinations (re-frame/subscribe [::subs/liked-combinations])
-            clothes (re-frame/subscribe [::subs/clothes])]
+            clothes (re-frame/subscribe [::subs/clothes])
+            user-id (re-frame/subscribe [::subs/current-user-id])]
 
            ;; Fetch pri mountovanju
-           (re-frame/dispatch [::events/fetch-clothes])
-           (re-frame/dispatch [::events/fetch-liked-combinations 2]) ; postavi user ID direktno
+           ;(re-frame/dispatch [::events/fetch-clothes])
+           ;(re-frame/dispatch [::events/fetch-liked-combinations (js/parseInt user-id)])
 
            (fn []
                (let [data-ready? (and (seq @liked-combinations) (seq @clothes))]
