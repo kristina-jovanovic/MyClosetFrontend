@@ -121,8 +121,9 @@
       (let [opinion (:last-feedback-opinion db)]
            (cond
              (or (= opinion "like") (= opinion :like))
-             {:db       (dissoc db :feedback-message :last-feedback-opinion)
-              :navigate [:liked-combinations]}
+             {:db         (dissoc db :feedback-message :last-feedback-opinion)
+              :navigate   [:liked-combinations]
+              :dispatch-n [[::fetch-liked-combinations (:current-user-id db)]]}
 
              :else
              {:db (dissoc db :feedback-message :last-feedback-opinion)} ; samo skloni poruku, UI vec prikazuje sledecu kombinaciju
@@ -152,7 +153,7 @@
 ;get liked-combinations
 (re-frame/reg-event-fx
   ::fetch-liked-combinations
-  (fn [_ [_ user-id]]      ; event vektor je npr [::fetch-liked-combinations 1]
+  (fn [_ [_ user-id]]                                       ; event vektor je npr [::fetch-liked-combinations 1]
       {:http-xhrio {:method          :get
                     :uri             (str "http://localhost:3000/liked-combinations?user-id=" (->num user-id))
                     :response-format (ajax/json-response-format {:keywords? true})
@@ -163,6 +164,7 @@
   ::fetch-liked-combinations-success
   (fn [db [_ response]]
       (let [parsed (map #(into {} %) response)]
+           (js/console.log "Fetched liked combinations:" (clj->js response))
            (assoc db :liked-combinations parsed))))
 
 
@@ -177,27 +179,30 @@
   ::update-rating
   (fn [{:keys [db]} [_ combination-id new-rating]]
       (let [user-id (:current-user-id db)]
-      {:http-xhrio {:method          :put
-                    :uri             "http://localhost:3000/update-rating"
-                    :params          {:combination-id combination-id
-                                      :rating         new-rating
-                                      :user-id        (->num user-id)}
-                    :format          (ajax/json-request-format)
-                    :response-format (ajax/json-response-format {:keywords? true})
-                    :on-success      [::update-rating-success combination-id new-rating]
-                    :on-failure      [::update-rating-failure]}})))
+           {:http-xhrio {:method          :put
+                         :uri             "http://localhost:3000/update-rating"
+                         :params          {:combination-id combination-id
+                                           :rating         new-rating
+                                           :user-id        (->num user-id)}
+                         :format          (ajax/json-request-format)
+                         :response-format (ajax/json-response-format {:keywords? true})
+                         :on-success      [::update-rating-success combination-id new-rating]
+                         :on-failure      [::update-rating-failure]}})))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
   ::update-rating-success
-  (fn [db [_ combination-id new-rating response]]
-      (js/console.log "Rating updated successfully:" (clj->js response))
-      (update db :liked-combinations
-              (fn [items]
-                  (mapv (fn [comb]
-                            (if (= (:combination-id comb) combination-id)
-                              (assoc comb :rating new-rating)
-                              comb))
-                        items)))))
+  (fn [{:keys [db]} [_ combination-id new-rating response]]
+      (let [user-id (:current-user-id db)]
+           (js/console.log "Rating updated successfully:" (clj->js response))
+           {:db         (update db :liked-combinations
+                                (fn [items]
+                                    (->> (or items [])
+                                         (mapv (fn [comb]
+                                                   (if (= (:combination-id comb) combination-id)
+                                                     (assoc comb :rating new-rating)
+                                                     comb))))))
+            :dispatch-n [[::fetch-favorite-combinations user-id]]})))
+
 
 (re-frame/reg-event-fx
   ::update-rating-failure
@@ -220,6 +225,7 @@
   ::fetch-favorite-combinations-success
   (fn [db [_ response]]
       (let [parsed (map #(into {} %) response)]
+           (js/console.log "Fetched favorite combinations:" (clj->js response))
            (assoc db :favorite-combinations parsed))))
 
 
@@ -240,91 +246,6 @@
                     :on-success      [::fetch-users-success]
                     :on-failure      [::fetch-users-failure]}}))
 
-;(re-frame/reg-event-db
-;  ::fetch-users-success
-;  (fn [db [_ users]]
-;      (let [db' (assoc db :users users)
-;            current-id (:current-user-id db')
-;            ; ako current-id ne postoji u listi korisnika, uzmi prvog
-;            valid-id (or (some->> users (some #(when (= (:id %) current-id) (:id %))))
-;                         (:id (first users)))]
-;           (js/console.log "Fetch users success")
-;           (cond-> db'
-;                   valid-id (assoc :current-user-id valid-id)))))
-
-;(re-frame/reg-event-db
-;  ::fetch-users-success
-;  (fn [db [_ users]]
-;      (let [users'
-;            ;(mapv #(update % :id js/parseInt 10) users) ;; svi id u broj
-;            (->> users
-;                 (map (fn [u]
-;                          (if-let [nid (->num (:id u))]
-;                                  (assoc u :id nid)
-;                                  nil)))
-;                 (remove nil?)
-;                 vec)
-;            db'    (assoc db :users users')
-;            cur-id (:current-user-id db')]
-;           (js/console.log "Fetch users success")
-;           ; ako trenutni id nije u novoj listi, postavi na prvog, inace ostavi kako jeste
-;           (if (and (seq users')
-;                    (not (some #(= (:id %) cur-id) users')))
-;             (assoc db' :current-user-id (:id (first users')))
-;             db'))))
-
-;(re-frame/reg-event-db
-;  ::fetch-users-success
-;  (fn [db [_ users]]
-;      (let [users' (->> users
-;                        (mapv #(update % :id js/parseInt 10)))
-;            db'    (assoc db :users users')]
-;           (js/console.log "Fetch users success")
-;           ; samo ako id nije postavljen, uzmi prvog
-;           (if (nil? (:current-user-id db'))
-;             (assoc db' :current-user-id (:id (first users')))
-;             db'))))
-;
-;(re-frame/reg-event-db
-;  ::fetch-users-success
-;  (fn [db [_ users]]
-;      (let [users' (->> users
-;                        (mapv #(if-let [n (some-> (:id %) js/parseInt)]
-;                                       (assoc % :id n)
-;                                       nil))
-;                        (remove nil?)) ;; ukloni nevalidne user-e
-;            db'    (assoc db :users users')]
-;           (if (nil? (:current-user-id db'))
-;             (assoc db' :current-user-id (:id (first users')))
-;             db'))))
-
-;(re-frame/reg-event-db
-;  ::fetch-users-success
-;  (fn [db [_ users]]
-;      ;; Pretvori sve id-jeve u broj i filtriraj samo validne
-;      (let [users' (->> users
-;                        (mapv (fn [u]
-;                                  (if-let [id-num (->num (:user-id u))]
-;                                          (assoc u :user-id id-num)
-;                                          nil)))
-;                        (remove nil?))
-;            db'    (assoc db :users users')]
-;           (if (nil? (:current-user-id db'))
-;             (assoc db' :current-user-id (:user-id (first users')))
-;             db'))))
-
-;(re-frame/reg-event-db
-;  ::fetch-users-success
-;  (fn [db [_ users]]
-;      (let [users' (->> users
-;                        (mapv #(update % :user-id js/parseInt 10))
-;                        (remove nil?))
-;            db' (assoc db :users users')]
-;           ;; NE menjaj current-user-id ako već postoji
-;           (if (some? (:current-user-id db'))
-;             db'
-;             (assoc db' :current-user-id (:user-id (first users')))))))
-
 (re-frame/reg-event-db
   ::fetch-users-success
   (fn [db [_ users]]
@@ -333,7 +254,7 @@
                         (remove nil?))
             db' (assoc db :users users')]
            (if (number? (:current-user-id db'))
-             db' ; vec postoji, ne menjaj
+             db'                                            ; vec postoji, ne menjaj
              (assoc db' :current-user-id (:user-id (first users')))))))
 
 
@@ -344,29 +265,6 @@
       db))
 
 ; kad se promeni user u dropdownu, azuriramo db i refetchujemo favorites i recommendations
-;(re-frame/reg-event-fx
-;  ::set-current-user-id
-;  (fn [{:keys [db]} [_ id-str]]
-;      (let [user-id (some-> id-str (js/parseInt 10))]
-;           {:db (assoc db :current-user-id user-id)
-;            ;:dispatch-n [[::fetch-favorite-combinations user-id]
-;            ;             [::fetch-recommendations user-id]]
-;            })))
-
-;(re-frame/reg-event-fx
-;  ::set-current-user-id
-;  (fn [{:keys [db]} [_ id-str]]
-;      ; ako dodje "", ne radi nista, ostaje trenutni
-;      (if (or (nil? id-str) (= id-str ""))
-;        {:db db}
-;        (let [user-id (->num id-str)]
-;             (if (nil? user-id)
-;               {:db db}
-;               {:db (assoc db :current-user-id user-id)
-;                ;:dispatch-n [[::fetch-favorite-combinations user-id]
-;                ;             [::fetch-recommendations user-id]]
-;                })))))
-
 (re-frame/reg-event-fx
   ::set-current-user-id
   (fn [{:keys [db]} [_ id-str]]
@@ -374,7 +272,7 @@
            (js/console.log "Current " id-str)
            (if (js/isNaN user-id)
              {:db db}
-             {:db (assoc db :current-user-id user-id)
+             {:db         (assoc db :current-user-id user-id)
               :dispatch-n [[::fetch-favorite-combinations user-id]
                            ;[::fetch-recommendations user-id]
                            [::fetch-liked-combinations user-id]]

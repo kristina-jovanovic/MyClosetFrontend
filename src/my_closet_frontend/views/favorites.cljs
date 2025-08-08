@@ -6,19 +6,9 @@
             [my-closet-frontend.events :as events]
             [clojure.string :as str]))
 
-;
-;(defonce combinations (r/atom
-;                        [{:id 1 :images ["https://picsum.photos/150"
-;                                         "https://picsum.photos/150"
-;                                         "https://picsum.photos/150"]
-;                          :description "Lorem"}
-;                         {:id 2 :images ["https://picsum.photos/150"
-;                                         "https://picsum.photos/150"]
-;                          :description "Lorem"}]))
-
 (defn normalize-combination [combination clothes]
       (cond
-        ;; kombinacija je lista komada
+        ; kombinacija je lista komada
         (and (sequential? combination)
              (map? (first combination))
              (:photo (first combination)))
@@ -26,7 +16,7 @@
           ;(js/console.log "Kombinacija je direktna lista komada")
           (vec combination))
 
-        ;; kombinacija iz baze
+        ; kombinacija iz baze
         (and (map? combination)
              (string? (:pieces combination)))
         (let [ids (map #(js/parseInt %) (clojure.string/split (:pieces combination) #","))
@@ -39,14 +29,6 @@
           (js/console.warn "Neprepoznat format kombinacije!" (clj->js combination))
           nil)))
 
-;(defn combination-item [{:keys [id images description]}]
-;      [:div.combination
-;       [:div.image-container
-;        (for [img images]
-;             [:img.clothing-image {:src img :key img}])]
-;       [:div.rating
-;        "Description: " description]])
-
 (defn combination-item [combination clothes]
       (let [unpacked (normalize-combination combination clothes)
             images (map :photo unpacked)]
@@ -58,32 +40,13 @@
             [:div.rating
              "Description: " (str/join ", " (map :name unpacked))]]))
 
-;(defn favorites-panel []
-;      (let [favorite-combinations (re-frame/subscribe [::subs/favorite-combinations])
-;            clothes (re-frame/subscribe [::subs/clothes])]
-;
-;           ;; Fetch pri mountovanju
-;           (re-frame/dispatch [::events/fetch-clothes])
-;           (re-frame/dispatch [::events/fetch-favorite-combinations 2]) ; postavi user ID direktno
-;
-;           (fn []
-;               (let [data-ready? (and (seq @favorite-combinations) (seq @clothes))]
-;                    [:div.home
-;                     [:div.liked-container
-;                      [:h2.title {:style {:color "#cb5b85"}} "Your favorite combinations"]
-;                      (if-not data-ready?
-;                              [:p "Loading..."]
-;                              (for [fav-comb @favorite-combinations]
-;                                   ^{:key (:combination-id fav-comb)}
-;                                   [combination-item fav-comb @clothes]))]]))))
-
 (defn favorites-panel []
       (let [favorite-combinations (re-frame/subscribe [::subs/favorite-combinations])
             clothes               (re-frame/subscribe [::subs/clothes])
             user-id (re-frame/subscribe [::subs/current-user-id])]
 
-           ;; Fetch pri mountovanju
-           ;(re-frame/dispatch [::events/fetch-clothes])
+           ; fetch pri mountovanju
+           (re-frame/dispatch [::events/fetch-clothes])
            ;(re-frame/dispatch [::events/fetch-favorite-combinations (js/parseInt user-id)])
 
            (fn []
@@ -101,7 +64,7 @@
                         (empty? favs)
                         [:p "There are no combinations with rating 5."]
 
-                        ;; Ima omiljenih
+                        ; ima omiljenih
                         :else
                         (for [fav-comb favs]
                              ^{:key (:combination-id fav-comb)}

@@ -15,15 +15,31 @@
              (:photo (first combination)))
         (do
           (js/console.log "Kombinacija je direktna lista komada")
-          (vec combination))
+          {:pieces (vec combination)
+           :combination-id nil})
 
         ; kombinacija iz baze
+        ;(and (map? combination)
+        ;     (string? (:pieces combination)))
+        ;(let [ids (map #(js/parseInt %) (clojure.string/split (:pieces combination) #","))
+        ;      clothes-by-id (group-by :piece-id clothes)]
+        ;     (js/console.log "Kombinacija iz baze, ID-jevi:" (clj->js ids))
+        ;     (vec (map #(first (get clothes-by-id %)) ids)))
+
         (and (map? combination)
              (string? (:pieces combination)))
-        (let [ids (map #(js/parseInt %) (clojure.string/split (:pieces combination) #","))
-              clothes-by-id (group-by :piece-id clothes)]
-             (js/console.log "Kombinacija iz baze, ID-jevi:" (clj->js ids))
-             (vec (map #(first (get clothes-by-id %)) ids)))
+        (let [comb-id       (:combination-id combination)
+              ids           (map #(js/parseInt %) (clojure.string/split (:pieces combination) #","))
+              clothes-by-id (group-by :piece-id clothes)
+              pieces        (->> ids
+                                 (map #(first (get clothes-by-id %)))
+                                 (remove nil?)
+                                 vec)]
+             (js/console.log "Kombinacija iz baze, ID-jevi:" (clj->js (vec ids)))
+             (when (not= (count pieces) (count ids))
+                   (js/console.warn "Neka od ID-jeva nije pronađena u 'clothes'!"))
+             {:pieces pieces
+              :combination-id comb-id})
 
         :else
         (do
@@ -38,8 +54,8 @@
             user-id (re-frame/subscribe [::subs/current-user-id])]
 
            ;; Fetch pri mountovanju
-           ;(re-frame/dispatch [::events/fetch-clothes])
-           ;(re-frame/dispatch [::events/fetch-recommendations])
+           (re-frame/dispatch [::events/fetch-clothes])
+           (re-frame/dispatch [::events/fetch-recommendations @user-id])
 
            (fn []
 
@@ -48,7 +64,10 @@
                                             (< @current-index (count @combinations)))
                                        (nth @combinations @current-index))
                      unpacked (when data-ready?
-                                    (normalize-combination combination @clothes))]
+                                    (normalize-combination combination @clothes))
+                     pieces       (:pieces unpacked)
+                     comb-id      (:combination-id unpacked)
+                     uid          (js/parseInt @user-id)]
 
                     (js/console.log "COMBINATION @index" (clj->js combination))
                     (js/console.log "CLOTHES" (clj->js @clothes))
@@ -85,7 +104,7 @@
                            :else
                            [:<>
                             [:div.clothes-container {:key @current-index}
-                             (for [row (partition-all 2 unpacked)]
+                             (for [row (partition-all 2 pieces)]
                                   [:div.clothes-row
                                    (for [piece row]
                                         ^{:key (:piece-id piece)}
@@ -96,17 +115,19 @@
                               {:on-click
                                #(do (swap! current-index inc)
                                     (re-frame/dispatch
-                                      [::events/insert-feedback {:user-id     (js/parseInt user-id)
-                                                                 :combination combination
-                                                                 :opinion     "dislike"}]))}
+                                      [::events/insert-feedback {:user-id        uid
+                                                                 :combination-id comb-id
+                                                                 :combination    combination
+                                                                 :opinion        "dislike"}]))}
                               "Dislike"]
 
                              [:button.btn.like
                               {:on-click
                                #(re-frame/dispatch
-                                  [::events/insert-feedback {:user-id     (js/parseInt user-id)
-                                                             :combination combination
-                                                             :opinion     "like"}])}
+                                  [::events/insert-feedback {:user-id        uid
+                                                             :combination-id comb-id
+                                                             :combination    combination
+                                                             :opinion        "like"}])}
                               "Like"]]])])]]))))
 
 

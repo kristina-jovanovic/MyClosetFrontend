@@ -56,7 +56,7 @@
             user-id (re-frame/subscribe [::subs/current-user-id])]
 
            ;; Fetch pri mountovanju
-           ;(re-frame/dispatch [::events/fetch-clothes])
+           (re-frame/dispatch [::events/fetch-clothes])
            ;(re-frame/dispatch [::events/fetch-liked-combinations (js/parseInt user-id)])
 
            (fn []

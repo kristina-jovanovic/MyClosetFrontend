@@ -3,6 +3,6 @@
 (def default-db
   {:name "re-frame"
    :users []
-   :current-user-id nil
+   :current-user-id 1
    :favorite-combinations []
    :combinations []})

@@ -18,17 +18,6 @@
           "favorites" :favorites
           "my-clothes" :my-clothes}]))
 
-;(def routes
-;  ["/"
-;   [["" :home]
-;    ["about" :about]
-;    ["get-recommendation" :get-recommendation]
-;    ["recommendations" :recommendations]
-;    ["liked-combinations" :liked-combinations]
-;    ["favorites" :favorites]
-;    ["my-clothes" :my-clothes]]])
-
-
 (defn parse
   [url]
   (bidi/match-route @routes url))
